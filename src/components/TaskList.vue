@@ -6,10 +6,12 @@
     empty-text="Aucune tache"
     style="width: 100%"
     v-loading="areTasksLoading"
+    ref="table"
     >
 
     <el-table-column
       prop="name"
+      sort-by='startTime'
       label="Tâche">
     </el-table-column>
 
@@ -103,6 +105,10 @@
         navigator.clipboard.writeText(text)
       }
       
-    }
+    },
+    mounted () {
+      const sortBy= (this.$route.query.sortBy === 'ascending') ? 'ascending' : 'descending';
+      this.$refs.table.sort('name', sortBy);
+    },
   }
 </script>

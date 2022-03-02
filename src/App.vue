@@ -12,6 +12,10 @@
       </el-header>
 
       <el-main>
+
+        
+        <router-view> </router-view>
+
         <TaskList 
           :tasks="tasks" 
           :areTasksLoading="areTasksLoading"
@@ -45,12 +49,43 @@
         areTasksLoading: true
       }
     },
+    watch: {
+      tasks: {
+        // Mise à jour de toutes les tachees en API dès que tasks change
+        deep: true,
+        async handler (newVal, oldVal){
+          if (newVal !== null && oldVal !== null){
+            try {
+              await TaskService.updateAll(this.tasks)
+            } catch (e){
+              console.error(e)
+              this.$notify({
+                title: 'Mode hors-ligne',
+                message : `Synchronistion des taches impossible`,
+                type: 'error',
+                offset: 50,
+                duration:3000
+              })
+            }
+          }
+        }
+      }
+
+    },
 
     async created (){
       try {
         this.tasks = await TaskService.getAll()
       } catch (e) {
         console.error(e)
+        this.tasks = []
+        this.$notify({
+          title : "Mode hors-ligne",
+          message: `Récupération des taches impossible`,
+          type: 'error',
+          offset: 50,
+          duration: 3000
+        })
       }
       this.areTasksLoading = false
     },
